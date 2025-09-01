@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Træning af ordforråd funktionsord(DA→RU)</title>
+<style>
+body { font-family: sans-serif; line-height: 1.6; margin: 20px; }
+.word { border: 1px solid #ccc; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+.hidden { display: none; }
+input[type="text"] { padding: 5px; margin: 3px; width: 120px; }
+button { margin-left: 5px; padding: 5px 10px; }
+.correct { background-color: #c8f7c5; } /* зелёный */
+.wrong { background-color: #f7c5c5; }   /* красный */
+.wordSpan { margin-right: 3px; }
+</style>
+</head>
+<body>
+<h2>Træning af ordforråd funktionsord(DA→RU)</h2>
+<label><input type="checkbox" id="toggleWords"> Skjul alle ord</label>
+<label><input type="checkbox" id="toggleTranslations"> Skjul alle oversættelser</label>
+
+<div id="wordsContainer"></div>
+
+<script>
+const words = [
+  // --- Союзы, частицы, предлоги ---
+  { da: "at", ru: "что, чтобы", ex: "Jeg vil gerne ___ spise.", parts: ["at"] },
+  { da: "af", ru: "от, из", ex: "Han er bange ___ hunden.", parts: ["af"] },
+  { da: "med", ru: "с", ex: "Hun går ___ sin ven.", parts: ["med"] },
+  { da: "når", ru: "когда (буд.)", ex: "Jeg ringer ___ jeg kommer hjem.", parts: ["når"] },
+  { da: "da", ru: "когда (прош.)", ex: "Jeg var glad ___ jeg så dig.", parts: ["da"] },
+  { da: "derfor", ru: "поэтому", ex: "Det regner, ___ jeg bliver hjemme.", parts: ["derfor"] },
+  { da: "på", ru: "на", ex: "Bogen ligger ___ bordet.", parts: ["på"] },
+  { da: "til", ru: "к, для", ex: "Jeg går ___ skolen.", parts: ["til"] },
+  { da: "og", ru: "и", ex: "Han køber kaffe ___ te.", parts: ["og"] },
+  { da: "i", ru: "в", ex: "Jeg bor ___ Danmark.", parts: ["i"] },
+  { da: "for", ru: "для, ибо", ex: "Han kom ikke, ___ han var syg.", parts: ["for"] },
+  { da: "om", ru: "о, если", ex: "Vi taler ___ vejret.", parts: ["om"] },
+  { da: "men", ru: "но", ex: "Jeg vil gerne gå, ___ jeg er træt.", parts: ["men"] },
+  { da: "eller", ru: "или", ex: "Vil du have kaffe ___ te?", parts: ["eller"] },
+  { da: "også", ru: "тоже", ex: "Hun er træt, og jeg er ___ træt.", parts: ["også"] },
+  { da: "bare", ru: "просто, лишь бы", ex: "Det var ___ for sjov.", parts: ["bare"] },
+
+  // --- Множественные конструкции ---
+  { da: "både ... og", ru: "и ... и", ex: "Hun taler ___ dansk ___ engelsk.", parts: ["både", "og"] },
+  { da: "hverken ... eller", ru: "ни ... ни", ex: "Han drikker ___ kaffe ___ te.", parts: ["hverken", "eller"] },
+
+  // --- Местоимения ---
+  { da: "vi", ru: "мы", ex: "___ går i skole.", parts: ["vi"] },
+  { da: "jeg", ru: "я", ex: "___ hedder Anna.", parts: ["jeg"] },
+  { da: "du", ru: "ты", ex: "___ er min ven.", parts: ["du"] },
+  { da: "han", ru: "он", ex: "___ spiller fodbold.", parts: ["han"] },
+  { da: "hun", ru: "она", ex: "___ læser en bog.", parts: ["hun"] },
+  { da: "man", ru: "человек / безлично", ex: "___ siger, at vejret er dårligt.", parts: ["man"] },
+  { da: "mig", ru: "меня/мне", ex: "Kan du hjælpe ___?", parts: ["mig"] },
+  { da: "dig", ru: "тебя/тебе", ex: "Jeg savner ___.", parts: ["dig"] },
+  { da: "sig", ru: "себя", ex: "Han vasker ___.", parts: ["sig"] },
+  { da: "dem", ru: "их, им", ex: "Jeg kender ___.", parts: ["dem"] },
+  { da: "vores", ru: "наш", ex: "Det er ___ hus.", parts: ["vores"] },
+  { da: "jeres", ru: "ваш", ex: "Det er ___ bil.", parts: ["jeres"] },
+  { da: "sin", ru: "свой (3-е лицо)", ex: "Hun elsker ___ kat.", parts: ["sin"] },
+  { da: "mit", ru: "мой (n)", ex: "Det er ___ hus.", parts: ["mit"] },
+  { da: "dit", ru: "твой (n)", ex: "Hvor er ___ værelse?", parts: ["dit"] },
+  { da: "hans", ru: "его", ex: "Det er ___ hund.", parts: ["hans"] },
+  { da: "hendes", ru: "её", ex: "Jeg så ___ taske.", parts: ["hendes"] },
+
+  // --- Наречия ---
+  { da: "igen", ru: "снова", ex: "Vi ses ___.", parts: ["igen"] },
+  { da: "aldrig", ru: "никогда", ex: "Han kommer ___ for sent.", parts: ["aldrig"] },
+  { da: "altid", ru: "всегда", ex: "Hun er ___ glad.", parts: ["altid"] },
+  { da: "må", ru: "можно, должен", ex: "Du ___ ikke ryge her.", parts: ["må"] },
+  { da: "skal", ru: "должен", ex: "Jeg ___ i skole i morgen.", parts: ["skal"] },
+  { da: "kan", ru: "может", ex: "Hun ___ tale fransk.", parts: ["kan"] },
+  { da: "vil", ru: "хочет", ex: "Jeg ___ gerne lære dansk.", parts: ["vil"] },
+  { da: "ja", ru: "да", ex: "___, jeg vil gerne.", parts: ["ja"] },
+  { da: "nej", ru: "нет", ex: "___, jeg kan ikke.", parts: ["nej"] },
+  { da: "nogen", ru: "кто-то, какие-то", ex: "Kender du ___ her?", parts: ["nogen"] },
+  { da: "noget", ru: "что-то", ex: "Der er ___ på bordet.", parts: ["noget"] },
+
+  // --- Вспомогательные глаголы ---
+  { da: "er", ru: "есть, является", ex: "Hun ___ lærer.", parts: ["er"] },
+  { da: "var", ru: "был", ex: "Han ___ syg i går.", parts: ["var"] },
+  { da: "har", ru: "имеет", ex: "Jeg ___ en bog.", parts: ["har"] },
+  { da: "havde", ru: "имел", ex: "Vi ___ travlt i går.", parts: ["havde"] },
+  { da: "bliver", ru: "становится", ex: "Det ___ koldt i aften.", parts: ["bliver"] },
+  { da: "blev", ru: "стал", ex: "Han ___ glad.", parts: ["blev"] },
+  { da: "er blevet", ru: "стал (результат)", ex: "Han ___ syg.", parts: ["er", "blevet"] },
+
+  // --- Hv-ord ---
+  { da: "hvad", ru: "что", ex: "___ laver du?", parts: ["hvad"] },
+  { da: "hvem", ru: "кто", ex: "___ er han?", parts: ["hvem"] },
+  { da: "hvor", ru: "где", ex: "___ bor du?", parts: ["hvor"] },
+  { da: "hvornår", ru: "когда", ex: "___ kommer du?", parts: ["hvornår"] },
+  { da: "hvorfor", ru: "почему", ex: "___ griner du?", parts: ["hvorfor"] },
+  { da: "hvordan", ru: "как", ex: "___ går det?", parts: ["hvordan"] },
+  { da: "hvilken", ru: "какой (en)", ex: "___ bog læser du?", parts: ["hvilken"] },
+  { da: "hvilket", ru: "какой (et)", ex: "___ hus er dit?", parts: ["hvilket"] },
+  { da: "hvilke", ru: "какие (мн.ч.)", ex: "___ film kan du lide?", parts: ["hvilke"] }
+];
+
+
+const container = document.getElementById("wordsContainer");
+
+words.forEach((w, idx) => {
+  const div = document.createElement("div");
+  div.className = "word";
+
+  const da = document.createElement("div");
+  da.className = "daWord";
+  da.textContent = "DA: " + w.da;
+
+  const ru = document.createElement("div");
+  ru.className = "ruWord";
+  ru.textContent = "RU: " + w.ru;
+
+  const exDiv = document.createElement("div");
+  const parts = w.parts;
+  let partIdx = 0;
+  w.ex.split(" ").forEach(word => {
+    if(word.includes("___")) {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.dataset.word = parts[partIdx].toLowerCase();
+      partIdx++;
+      exDiv.appendChild(input);
+      exDiv.appendChild(document.createTextNode(" "));
+    } else {
+      const span = document.createElement("span");
+      span.textContent = word;
+      span.className = "wordSpan";
+      span.dataset.word = word.replace(/[.,!?]/g,"").toLowerCase();
+      exDiv.appendChild(span);
+      exDiv.appendChild(document.createTextNode(" "));
+    }
+  });
+
+  // Кнопка проверки ввода
+  const checkBtn = document.createElement("button");
+  checkBtn.textContent = "Tjek";
+  checkBtn.onclick = () => {
+    exDiv.querySelectorAll("input").forEach(inp => {
+      if(inp.value.trim().toLowerCase() === inp.dataset.word){
+        inp.classList.add("correct");
+        inp.classList.remove("wrong");
+      } else {
+        inp.classList.add("wrong");
+        inp.classList.remove("correct");
+      }
+    });
+  };
+
+  // 🎤 Распознавание речи с микрофона
+  const micBtn = document.createElement("button");
+  micBtn.textContent = "🎙️ Læs højt";
+  micBtn.onclick = () => {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "da-DK";
+    recognition.interimResults = false;
+    recognition.start();
+
+    recognition.onresult = event => {
+      const spoken = event.results[0][0].transcript.toLowerCase();
+      exDiv.querySelectorAll("span, input").forEach(el => {
+        const word = el.dataset.word;
+        if(spoken.includes(word)){
+          el.classList.add("correct");
+          el.classList.remove("wrong");
+        } else {
+          el.classList.add("wrong");
+          el.classList.remove("correct");
+        }
+      });
+    };
+    recognition.onerror = err => console.error("SpeechRecognition error:", err);
+  };
+
+  // ⏺️ Запись и воспроизведение голоса
+  const recordBtn = document.createElement("button");
+  recordBtn.textContent = "⏺️ Optag og spil";
+  let audioBlob = null;
+
+  recordBtn.onclick = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mediaRecorder = new MediaRecorder(stream);
+    let chunks = [];
+    mediaRecorder.ondataavailable = e => chunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      audioBlob = new Blob(chunks, { type: 'audio/webm' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audio.play();
+    };
+    mediaRecorder.start();
+    setTimeout(() => mediaRecorder.stop(), 3000); // записываем 3 сек
+  };
+
+  // 🔊 Прослушать оригинал
+  const playOrigBtn = document.createElement("button");
+  playOrigBtn.textContent = "▶️ Hør original";
+  playOrigBtn.onclick = () => {
+    const utterance = new SpeechSynthesisUtterance(w.ex.replace(/___/g, w.parts.join(" ")));
+    utterance.lang = "da-DK";
+    window.speechSynthesis.speak(utterance);
+  };
+
+  div.appendChild(da);
+  div.appendChild(ru);
+  div.appendChild(exDiv);
+  div.appendChild(checkBtn);
+  div.appendChild(micBtn);
+  div.appendChild(recordBtn);
+  div.appendChild(playOrigBtn);
+  container.appendChild(div);
+});
+
+// скрытие слов / переводов
+document.getElementById("toggleWords").onchange = e => {
+  document.querySelectorAll(".daWord").forEach(d => d.classList.toggle("hidden", e.target.checked));
+};
+document.getElementById("toggleTranslations").onchange = e => {
+  document.querySelectorAll(".ruWord").forEach(d => d.classList.toggle("hidden", e.target.checked));
+};
+</script>
+</body>
+</html>

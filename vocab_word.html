@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Træning af ordforråd substantiver(DA→RU)</title>
+<style>
+body { font-family: sans-serif; line-height: 1.6; margin: 20px; }
+.word { border: 1px solid #ccc; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+.hidden { display: none; }
+input[type="text"] { padding: 5px; margin: 3px; width: 120px; }
+button { margin-left: 5px; padding: 5px 10px; }
+.correct { background-color: #c8f7c5; } /* зелёный */
+.wrong { background-color: #f7c5c5; }   /* красный */
+.wordSpan { margin-right: 3px; }
+</style>
+</head>
+<body>
+<h2>Træning af ordforråd substantiver(DA→RU)</h2>
+<label><input type="checkbox" id="toggleWords"> Skjul alle ord</label>
+<label><input type="checkbox" id="toggleTranslations"> Skjul alle oversættelser</label>
+
+<div id="wordsContainer"></div>
+
+<script>
+const words = [
+  // --- Природа и места ---
+  { da: "bakke", ru: "холм", ex: "Vi gik op ad ___ for at se udsigten.", parts: ["bakke"] },
+  { da: "eng", ru: "луг", ex: "Køerne græsser på ___.", parts: ["eng"] },
+  { da: "å", ru: "река / ручей", ex: "Vi fiskede i ___.", parts: ["å"] },
+  { da: "klippe", ru: "скала", ex: "De sad på en stor ___.", parts: ["klippe"] },
+  { da: "skov", ru: "лес", ex: "Vi gik en tur i ___.", parts: ["skov"] },
+  { da: "sø", ru: "озеро", ex: "Børnene svømmede i ___.", parts: ["sø"] },
+  { da: "strand", ru: "пляж", ex: "Vi tilbragte dagen på ___.", parts: ["strand"] },
+  { da: "dal", ru: "долина", ex: "Vi kørte gennem en smuk ___.", parts: ["dal"] },
+  { da: "mark", ru: "поле", ex: "Køerne går på ___.", parts: ["mark"] },
+  { da: "bæk", ru: "ручей", ex: "Fiskene svømmede i ___.", parts: ["bæk"] },
+
+  // --- Дом и вещи ---
+  { da: "reol", ru: "книжная полка", ex: "Bøgerne står i ___.", parts: ["reol"] },
+  { da: "skuffe", ru: "ящик", ex: "Jeg lagde dokumenterne i ___.", parts: ["skuffe"] },
+  { da: "pude", ru: "подушка", ex: "Sæt ___ på sofaen.", parts: ["pude"] },
+  { da: "tallerken", ru: "тарелка", ex: "Vi spiser af en ny ___.", parts: ["tallerken"] },
+  { da: "kop", ru: "чашка", ex: "Jeg drikker kaffe af en ___.", parts: ["kop"] },
+  { da: "gardin", ru: "занавеска", ex: "Træk ___ for vinduet.", parts: ["gardin"] },
+  { da: "lampe", ru: "лампа", ex: "Tænd ___ i stuen.", parts: ["lampe"] },
+  { da: "skab", ru: "шкаф", ex: "Jeg gemmer jakkerne i ___.", parts: ["skab"] },
+  { da: "tæppe", ru: "ковер / плед", ex: "Vi lægger ___ på gulvet.", parts: ["tæppe"] },
+  { da: "kommode", ru: "комод", ex: "Sæt bøgerne på ___.", parts: ["kommode"] },
+
+  // --- Люди и профессии ---
+  { da: "sygeplejerske", ru: "медсестра", ex: "___ arbejder på hospitalet.", parts: ["sygeplejerske"] },
+  { da: "lærer", ru: "учитель", ex: "___ underviser i dansk.", parts: ["lærer"] },
+  { da: "mekaniker", ru: "механик", ex: "Min ___ reparerer biler.", parts: ["mekaniker"] },
+  { da: "fotograf", ru: "фотограф", ex: "___ tager billeder til brylluppet.", parts: ["fotograf"] },
+  { da: "kunstner", ru: "художник", ex: "___ maler smukke billeder.", parts: ["kunstner"] },
+  { da: "journalist", ru: "журналист", ex: "___ skriver artikler til avisen.", parts: ["journalist"] },
+  { da: "kok", ru: "повар", ex: "___ laver mad på restauranten.", parts: ["kok"] },
+  { da: "politibetjent", ru: "полицейский", ex: "___ patruljerer i byen.", parts: ["politibetjent"] },
+  { da: "ingeniør", ru: "инженер", ex: "___ designer nye maskiner.", parts: ["ingeniør"] },
+  { da: "arkitekt", ru: "архитектор", ex: "___ tegner bygninger.", parts: ["arkitekt"] },
+
+  // --- Работа, учеба, учреждения ---
+  { da: "konference", ru: "конференция", ex: "Vi deltager i en ___ i København.", parts: ["konference"] },
+  { da: "semester", ru: "семестр", ex: "Det nye ___ starter i august.", parts: ["semester"] },
+  { da: "bibliotek", ru: "библиотека", ex: "Jeg låner bøger på ___.", parts: ["bibliotek"] },
+  { da: "laboratorium", ru: "лаборатория", ex: "Eleverne arbejder i et ___.", parts: ["laboratorium"] },
+  { da: "opslagstavle", ru: "доска объявлений", ex: "Meddelinger hænges på ___.", parts: ["opslagstavle"] },
+  { da: "universitet", ru: "университет", ex: "Han studerer på ___.", parts: ["universitet"] },
+  { da: "gymnasium", ru: "гимназия", ex: "Hun går på ___.", parts: ["gymnasium"] },
+  { da: "kontor", ru: "офис", ex: "Jeg arbejder på et ___.", parts: ["kontor"] },
+  { da: "fabrik", ru: "фабрика", ex: "___ producerer møbler.", parts: ["fabrik"] },
+  { da: "supermarked", ru: "супермаркет", ex: "Vi køber mad i ___.", parts: ["supermarked"] },
+    { da: "højland", ru: "плато, возвышенность", ex: "Vi gik på vandretur i ___.", parts: ["højland"] },
+  { da: "kløft", ru: "ущелье", ex: "Vi så en dyb ___ mellem klipperne.", parts: ["kløft"] },
+  { da: "fjeld", ru: "гора (в Скандинавии)", ex: "Vi besteg et højt ___.", parts: ["fjeld"] },
+  { da: "hede", ru: "вересковая пустошь", ex: "Dyrene græsser på ___.", parts: ["hede"] },
+  { da: "mos", ru: "болото", ex: "Vi gik forsigtigt over ___.", parts: ["mos"] },
+  { da: "voldgrav", ru: "ров, крепостной ров", ex: "Slottet havde en dyb ___.", parts: ["voldgrav"] },
+  { da: "ås", ru: "холм, гряда", ex: "Vi gik langs en lang ___.", parts: ["ås"] },
+  { da: "klit", ru: "песчаная дюна", ex: "Vi legede på ___.", parts: ["klit"] },
+  { da: "floddelta", ru: "дельта реки", ex: "Vi sejlede gennem et stort ___.", parts: ["floddelta"] },
+  { da: "skærgård", ru: "архипелаг", ex: "Vi sejlede gennem ___.", parts: ["skærgård"] },
+
+  // --- Дом и предметы ---
+  { da: "vægur", ru: "настенные часы", ex: "___ hænger på væggen.", parts: ["vægur"] },
+  { da: "skrivebord", ru: "письменный стол", ex: "Bøgerne ligger på ___.", parts: ["skrivebord"] },
+  { da: "reol", ru: "книжная полка", ex: "Bøgerne står i ___.", parts: ["reol"] },
+  { da: "loftslampe", ru: "люстра", ex: "Vi tændte ___.", parts: ["loftslampe"] },
+  { da: "paraply", ru: "зонт", ex: "Jeg tog min ___ med.", parts: ["paraply"] },
+  { da: "komfur", ru: "плита", ex: "Vi laver mad på ___.", parts: ["komfur"] },
+  { da: "ovn", ru: "духовка", ex: "Kagen bages i ___.", parts: ["ovn"] },
+  { da: "brødrister", ru: "тостер", ex: "Vi laver morgenmad med ___.", parts: ["brødrister"] },
+  { da: "stol", ru: "стул", ex: "Vi satte os på ___.", parts: ["stol"] },
+  { da: "sofabord", ru: "журнальный столик", ex: "Bøgerne ligger på ___.", parts: ["sofabord"] },
+
+  // --- Люди и профессии ---
+  { da: "økonom", ru: "экономист", ex: "___ analyserer markedet.", parts: ["økonom"] },
+  { da: "psykiater", ru: "психиатр", ex: "___ arbejder med patienter.", parts: ["psykiater"] },
+  { da: "fysioterapeut", ru: "физиотерапевт", ex: "___ hjælper patienter med øvelser.", parts: ["fysioterapeut"] },
+  { da: "bibliotekar", ru: "библиотекарь", ex: "___ arbejder på biblioteket.", parts: ["bibliotekar"] },
+  { da: "ingeniør", ru: "инженер", ex: "___ designer bygninger.", parts: ["ingeniør"] },
+  { da: "arkitekt", ru: "архитектор", ex: "___ tegner huse.", parts: ["arkitekt"] },
+  { da: "designer", ru: "дизайнер", ex: "___ laver møbler.", parts: ["designer"] },
+  { da: "journalist", ru: "журналист", ex: "___ skriver artikler.", parts: ["journalist"] },
+  { da: "kok", ru: "повар", ex: "___ arbejder på restauranten.", parts: ["kok"] },
+  { da: "læge", ru: "врач", ex: "___ undersøger patienter.", parts: ["læge"] }
+];
+
+
+const container = document.getElementById("wordsContainer");
+
+words.forEach((w, idx) => {
+  const div = document.createElement("div");
+  div.className = "word";
+
+  const da = document.createElement("div");
+  da.className = "daWord";
+  da.textContent = "DA: " + w.da;
+
+  const ru = document.createElement("div");
+  ru.className = "ruWord";
+  ru.textContent = "RU: " + w.ru;
+
+  const exDiv = document.createElement("div");
+  const parts = w.parts;
+  let partIdx = 0;
+  w.ex.split(" ").forEach(word => {
+    if(word.includes("___")) {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.dataset.word = parts[partIdx].toLowerCase();
+      partIdx++;
+      exDiv.appendChild(input);
+      exDiv.appendChild(document.createTextNode(" "));
+    } else {
+      const span = document.createElement("span");
+      span.textContent = word;
+      span.className = "wordSpan";
+      span.dataset.word = word.replace(/[.,!?]/g,"").toLowerCase();
+      exDiv.appendChild(span);
+      exDiv.appendChild(document.createTextNode(" "));
+    }
+  });
+
+  // Кнопка проверки ввода
+  const checkBtn = document.createElement("button");
+  checkBtn.textContent = "Tjek";
+  checkBtn.onclick = () => {
+    exDiv.querySelectorAll("input").forEach(inp => {
+      if(inp.value.trim().toLowerCase() === inp.dataset.word){
+        inp.classList.add("correct");
+        inp.classList.remove("wrong");
+      } else {
+        inp.classList.add("wrong");
+        inp.classList.remove("correct");
+      }
+    });
+  };
+
+  // 🎤 Распознавание речи с микрофона
+  const micBtn = document.createElement("button");
+  micBtn.textContent = "🎙️ Læs højt";
+  micBtn.onclick = () => {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "da-DK";
+    recognition.interimResults = false;
+    recognition.start();
+
+    recognition.onresult = event => {
+      const spoken = event.results[0][0].transcript.toLowerCase();
+      exDiv.querySelectorAll("span, input").forEach(el => {
+        const word = el.dataset.word;
+        if(spoken.includes(word)){
+          el.classList.add("correct");
+          el.classList.remove("wrong");
+        } else {
+          el.classList.add("wrong");
+          el.classList.remove("correct");
+        }
+      });
+    };
+    recognition.onerror = err => console.error("SpeechRecognition error:", err);
+  };
+
+  // ⏺️ Запись и воспроизведение голоса
+  const recordBtn = document.createElement("button");
+  recordBtn.textContent = "⏺️ Optag og spil";
+  let audioBlob = null;
+
+  recordBtn.onclick = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mediaRecorder = new MediaRecorder(stream);
+    let chunks = [];
+    mediaRecorder.ondataavailable = e => chunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      audioBlob = new Blob(chunks, { type: 'audio/webm' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audio.play();
+    };
+    mediaRecorder.start();
+    setTimeout(() => mediaRecorder.stop(), 3000); // записываем 3 сек
+  };
+
+  // 🔊 Прослушать оригинал
+  const playOrigBtn = document.createElement("button");
+  playOrigBtn.textContent = "▶️ Hør original";
+  playOrigBtn.onclick = () => {
+    const utterance = new SpeechSynthesisUtterance(w.ex.replace(/___/g, w.parts.join(" ")));
+    utterance.lang = "da-DK";
+    window.speechSynthesis.speak(utterance);
+  };
+
+  div.appendChild(da);
+  div.appendChild(ru);
+  div.appendChild(exDiv);
+  div.appendChild(checkBtn);
+  div.appendChild(micBtn);
+  div.appendChild(recordBtn);
+  div.appendChild(playOrigBtn);
+  container.appendChild(div);
+});
+
+// скрытие слов / переводов
+document.getElementById("toggleWords").onchange = e => {
+  document.querySelectorAll(".daWord").forEach(d => d.classList.toggle("hidden", e.target.checked));
+};
+document.getElementById("toggleTranslations").onchange = e => {
+  document.querySelectorAll(".ruWord").forEach(d => d.classList.toggle("hidden", e.target.checked));
+};
+</script>
+</body>
+</html>

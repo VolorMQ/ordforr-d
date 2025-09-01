@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Træning af ordforråd verber(DA→RU)</title>
+<style>
+body { font-family: sans-serif; line-height: 1.6; margin: 20px; }
+.word { border: 1px solid #ccc; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+.hidden { display: none; }
+input[type="text"] { padding: 5px; margin: 3px; width: 120px; }
+button { margin-left: 5px; padding: 5px 10px; }
+.correct { background-color: #c8f7c5; } /* зелёный */
+.wrong { background-color: #f7c5c5; }   /* красный */
+.wordSpan { margin-right: 3px; }
+</style>
+</head>
+<body>
+<h2>Træning af ordforråd verber(DA→RU)</h2>
+<label><input type="checkbox" id="toggleWords"> Skjul alle ord</label>
+<label><input type="checkbox" id="toggleTranslations"> Skjul alle oversættelser</label>
+
+<div id="wordsContainer"></div>
+
+<script>
+const words = [
+  { da: "overveje", ru: "размышлять, обдумывать", ex: "Jeg skal ___, om jeg vil tage jobbet.", parts: ["overveje"] },
+  { da: "forhandle", ru: "вести переговоры", ex: "Vi skal ___ med leverandøren.", parts: ["forhandle"] },
+  { da: "undersøge", ru: "исследовать, изучать", ex: "Lægen vil ___ patientens symptomer.", parts: ["undersøge"] },
+  { da: "udvikle", ru: "развивать, разрабатывать", ex: "Firmaet vil ___ en ny app.", parts: ["udvikle"] },
+  { da: "implementere", ru: "внедрять, реализовывать", ex: "Vi skal ___ den nye plan.", parts: ["implementere"] },
+  { da: "påvirke", ru: "влиять", ex: "Vejret kan ___ humøret.", parts: ["påvirke"] },
+  { da: "anbefale", ru: "рекомендовать", ex: "Jeg vil ___ denne bog til dig.", parts: ["anbefale"] },
+  { da: "begrunde", ru: "обосновывать", ex: "Kan du ___ dit svar?", parts: ["begrunde"] },
+  { da: "forklare", ru: "объяснять", ex: "Læreren vil ___ reglen.", parts: ["forklare"] },
+  { da: "udtrykke", ru: "выражать", ex: "Hun kan godt ___ sine følelser.", parts: ["udtrykke"] },
+  { da: "sammenligne", ru: "сравнивать", ex: "Vi skal ___ priserne.", parts: ["sammenligne"] },
+  { da: "konkludere", ru: "делать вывод", ex: "Vi kan ___, at forsøget var en succes.", parts: ["konkludere"] },
+  { da: "forstå", ru: "понимать", ex: "Jeg kan ikke ___, hvorfor han gjorde det.", parts: ["forstå"] },
+  { da: "godkende", ru: "утверждать, одобрять", ex: "Direktøren vil ___ budgettet.", parts: ["godkende"] },
+  { da: "afvise", ru: "отклонять, отвергать", ex: "Hun valgte at ___ invitationen.", parts: ["afvise"] },
+  { da: "acceptere", ru: "принимать", ex: "Jeg kan ikke ___ dette tilbud.", parts: ["acceptere"] },
+  { da: "beslutte", ru: "принимать решение", ex: "Vi skal ___, hvor vi skal rejse.", parts: ["beslutte"] },
+  { da: "udfordre", ru: "бросать вызов", ex: "Han vil ___ sine kolleger til en konkurrence.", parts: ["udfordre"] },
+  { da: "opfordre", ru: "призывать, побуждать", ex: "Læreren vil ___ eleverne til at læse mere.", parts: ["opfordre"] },
+  { da: "respektere", ru: "уважать", ex: "Vi skal ___ reglerne.", parts: ["respektere"] },
+  { da: "modstå", ru: "сопротивляться", ex: "Han kunne ikke ___ fristelsen.", parts: ["modstå"] },
+  { da: "udnytte", ru: "использовать (по максимуму)", ex: "Vi skal ___ ressourcerne bedre.", parts: ["udnytte"] },
+  { da: "overraske", ru: "удивлять", ex: "Hun vil ___ sin ven med en gave.", parts: ["overraske"] },
+  { da: "tilføje", ru: "добавлять", ex: "Kan du ___ flere oplysninger?", parts: ["tilføje"] },
+  { da: "forudsige", ru: "предсказывать", ex: "Meteorologen kan ___ vejret.", parts: ["forudsige"] },
+  { da: "udskyde", ru: "откладывать", ex: "Vi må ___ mødet til næste uge.", parts: ["udskyde"] },
+  { da: "sikre", ru: "обеспечивать", ex: "Vi skal ___ kvaliteten.", parts: ["sikre"] },
+  { da: "afslutte", ru: "заканчивать", ex: "Lad os ___ projektet i dag.", parts: ["afslutte"] },
+  { da: "forbedre", ru: "улучшать", ex: "Vi vil ___ processen.", parts: ["forbedre"] },
+  { da: "anvende", ru: "применять", ex: "Vi skal ___ denne metode.", parts: ["anvende"] },
+  { da: "tilpasse", ru: "адаптировать", ex: "Vi må ___ planen efter behov.", parts: ["tilpasse"] },
+  { da: "håndtere", ru: "обрабатывать, управлять", ex: "Han kan ___ svære situationer.", parts: ["håndtere"] },
+  { da: "konfrontere", ru: "сталкиваться, противостоять", ex: "Vi må ___ problemet direkte.", parts: ["konfrontere"] },
+  { da: "forstå", ru: "понимать", ex: "Jeg kan godt ___ denne tekst.", parts: ["forstå"] },
+  { da: "afklare", ru: "уточнять, прояснять", ex: "Lad os ___ detaljerne først.", parts: ["afklare"] },
+  { da: "opdage", ru: "обнаруживать", ex: "Vi ___ en fejl i systemet.", parts: ["opdage"] },
+  { da: "anerkende", ru: "признавать, одобрять", ex: "Man må ___ hans indsats.", parts: ["anerkende"] },
+  { da: "realisere", ru: "осознавать, реализовывать", ex: "Hun begyndte at ___ sin drøm.", parts: ["realisere"] },
+  { da: "observere", ru: "наблюдать", ex: "Vi ___ fuglene i haven.", parts: ["observere"] },
+  { da: "dokumentere", ru: "документировать", ex: "Skolen vil ___ resultaterne.", parts: ["dokumentere"] },
+  { da: "overholde", ru: "соблюдать", ex: "Alle skal ___ reglerne.", parts: ["overholde"] },
+  { da: "prioritere", ru: "приоритизировать", ex: "Vi må ___ de vigtigste opgaver.", parts: ["prioritere"] },
+  { da: "koordinerer", ru: "координировать", ex: "Han ___ projektet med teamet.", parts: ["koordinerer"] },
+  { da: "dele", ru: "делиться", ex: "Hun vil ___ sin erfaring.", parts: ["dele"] },
+  { da: "indsamle", ru: "собирать", ex: "Vi skal ___ data til analysen.", parts: ["indsamle"] },
+  { da: "sammenfatte", ru: "подводить итоги", ex: "Vi vil ___ rapporten.", parts: ["sammenfatte"] },
+  { da: "beskrive", ru: "описывать", ex: "Kan du ___ processen?", parts: ["beskrive"] },
+  { da: "forkaste", ru: "отбрасывать", ex: "Vi må ___ idéen.", parts: ["forkaste"] },
+  { da: "bekræfte", ru: "подтверждать", ex: "Kan du ___ mødet?", parts: ["bekræfte"] },
+  { da: "indlevere", ru: "сдавать, вручать", ex: "Husk at ___ opgaven til tiden.", parts: ["indlevere"] },
+  { da: "udvide", ru: "расширять", ex: "Vi vil ___ virksomheden til udlandet.", parts: ["udvide"] }
+];
+
+
+const container = document.getElementById("wordsContainer");
+
+words.forEach((w, idx) => {
+  const div = document.createElement("div");
+  div.className = "word";
+
+  const da = document.createElement("div");
+  da.className = "daWord";
+  da.textContent = "DA: " + w.da;
+
+  const ru = document.createElement("div");
+  ru.className = "ruWord";
+  ru.textContent = "RU: " + w.ru;
+
+  const exDiv = document.createElement("div");
+  const parts = w.parts;
+  let partIdx = 0;
+  w.ex.split(" ").forEach(word => {
+    if(word.includes("___")) {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.dataset.word = parts[partIdx].toLowerCase();
+      partIdx++;
+      exDiv.appendChild(input);
+      exDiv.appendChild(document.createTextNode(" "));
+    } else {
+      const span = document.createElement("span");
+      span.textContent = word;
+      span.className = "wordSpan";
+      span.dataset.word = word.replace(/[.,!?]/g,"").toLowerCase();
+      exDiv.appendChild(span);
+      exDiv.appendChild(document.createTextNode(" "));
+    }
+  });
+
+  // Кнопка проверки ввода
+  const checkBtn = document.createElement("button");
+  checkBtn.textContent = "Tjek";
+  checkBtn.onclick = () => {
+    exDiv.querySelectorAll("input").forEach(inp => {
+      if(inp.value.trim().toLowerCase() === inp.dataset.word){
+        inp.classList.add("correct");
+        inp.classList.remove("wrong");
+      } else {
+        inp.classList.add("wrong");
+        inp.classList.remove("correct");
+      }
+    });
+  };
+
+  // 🎤 Распознавание речи с микрофона
+  const micBtn = document.createElement("button");
+  micBtn.textContent = "🎙️ Læs højt";
+  micBtn.onclick = () => {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "da-DK";
+    recognition.interimResults = false;
+    recognition.start();
+
+    recognition.onresult = event => {
+      const spoken = event.results[0][0].transcript.toLowerCase();
+      exDiv.querySelectorAll("span, input").forEach(el => {
+        const word = el.dataset.word;
+        if(spoken.includes(word)){
+          el.classList.add("correct");
+          el.classList.remove("wrong");
+        } else {
+          el.classList.add("wrong");
+          el.classList.remove("correct");
+        }
+      });
+    };
+    recognition.onerror = err => console.error("SpeechRecognition error:", err);
+  };
+
+  // ⏺️ Запись и воспроизведение голоса
+  const recordBtn = document.createElement("button");
+  recordBtn.textContent = "⏺️ Optag og spil";
+  let audioBlob = null;
+
+  recordBtn.onclick = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mediaRecorder = new MediaRecorder(stream);
+    let chunks = [];
+    mediaRecorder.ondataavailable = e => chunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      audioBlob = new Blob(chunks, { type: 'audio/webm' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audio.play();
+    };
+    mediaRecorder.start();
+    setTimeout(() => mediaRecorder.stop(), 3000); // записываем 3 сек
+  };
+
+  // 🔊 Прослушать оригинал
+  const playOrigBtn = document.createElement("button");
+  playOrigBtn.textContent = "▶️ Hør original";
+  playOrigBtn.onclick = () => {
+    const utterance = new SpeechSynthesisUtterance(w.ex.replace(/___/g, w.parts.join(" ")));
+    utterance.lang = "da-DK";
+    window.speechSynthesis.speak(utterance);
+  };
+
+  div.appendChild(da);
+  div.appendChild(ru);
+  div.appendChild(exDiv);
+  div.appendChild(checkBtn);
+  div.appendChild(micBtn);
+  div.appendChild(recordBtn);
+  div.appendChild(playOrigBtn);
+  container.appendChild(div);
+});
+
+// скрытие слов / переводов
+document.getElementById("toggleWords").onchange = e => {
+  document.querySelectorAll(".daWord").forEach(d => d.classList.toggle("hidden", e.target.checked));
+};
+document.getElementById("toggleTranslations").onchange = e => {
+  document.querySelectorAll(".ruWord").forEach(d => d.classList.toggle("hidden", e.target.checked));
+};
+</script>
+</body>
+</html>
