@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+<meta charset="UTF-8">
+<title>Træning af ordforråd adjektiver(DA→RU)</title>
+<style>
+body { font-family: sans-serif; line-height: 1.6; margin: 20px; }
+.word { border: 1px solid #ccc; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
+.hidden { display: none; }
+input[type="text"] { padding: 5px; margin: 3px; width: 120px; }
+button { margin-left: 5px; padding: 5px 10px; }
+.correct { background-color: #c8f7c5; } /* зелёный */
+.wrong { background-color: #f7c5c5; }   /* красный */
+.wordSpan { margin-right: 3px; }
+</style>
+</head>
+<body>
+<h2>Træning af ordforråd adjektiver(DA→RU)</h2>
+<label><input type="checkbox" id="toggleWords"> Skjul alle ord</label>
+<label><input type="checkbox" id="toggleTranslations"> Skjul alle oversættelser</label>
+
+<div id="wordsContainer"></div>
+
+<script>
+const words = [
+  // --- Союзы, частицы, предлоги ---
+	{ da: "almindelig", ru: "обычный", ex: "Det var en ___ dag.", parts: ["almindelig"] },
+	{ da: "fantastisk", ru: "фантастический", ex: "Vi havde en ___ oplevelse.", parts: ["fantastisk"] },
+	{ da: "vigtig", ru: "важный", ex: "Det er ___ at være punktlig.", parts: ["vigtig"] },
+	{ da: "kompliceret", ru: "сложный", ex: "Opgaven var meget ___.", parts: ["kompliceret"] },
+	{ da: "overraskende", ru: "удивительный", ex: "Det var ___, hvor hurtigt han lærte det.", parts: ["overraskende"] },
+	{ da: "imponerende", ru: "впечатляющий", ex: "Hans præstation var virkelig ___.", parts: ["imponerende"] },
+	{ da: "udfordrende", ru: "требующий усилий", ex: "Projektet var ___ men spændende.", parts: ["udfordrende"] },
+	{ da: "betydelig", ru: "значительный", ex: "Der var en ___ forskel mellem de to resultater.", parts: ["betydelig"] },
+	{ da: "praktisk", ru: "практичный", ex: "Det er ___ at have en plan.", parts: ["praktisk"] },
+	{ da: "usædvanlig", ru: "необычный", ex: "Hun havde en ___ evne til at lære hurtigt.", parts: ["usædvanlig"] },
+	{ da: "moderne", ru: "современный", ex: "Vi boede i et ___ hus.", parts: ["moderne"] },
+	{ da: "traditionel", ru: "традиционный", ex: "De fejrede på en ___ måde.", parts: ["traditionel"] },
+	{ da: "effektiv", ru: "эффективный", ex: "Det var en ___ metode.", parts: ["effektiv"] },
+	{ da: "mystisk", ru: "таинственный", ex: "Der skete noget ___ i nat.", parts: ["mystisk"] },
+	{ da: "rolig", ru: "спокойный", ex: "Han følte sig ___ efter yogaen.", parts: ["rolig"] },
+	{ da: "glad", ru: "счастливый", ex: "Hun var ___ over nyheden.", parts: ["glad"] },
+	{ da: "trist", ru: "грустный", ex: "Han var ___ efter filmen.", parts: ["trist"] },
+	{ da: "venlig", ru: "дружелюбный", ex: "Hun er altid ___ mod børn.", parts: ["venlig"] },
+	{ da: "uhøflig", ru: "невежливый", ex: "Han var ___ mod servitricen.", parts: ["uhøflig"] },
+	{ da: "stærk", ru: "сильный", ex: "Han er ___ nok til at løfte boksen.", parts: ["stærk"] },
+	{ da: "svag", ru: "слабый", ex: "Hun følte sig ___ efter sygdommen.", parts: ["svag"] },
+	{ da: "klog", ru: "умный", ex: "Det var en ___ beslutning.", parts: ["klog"] },
+	{ da: "dum", ru: "глупый", ex: "Det var en ___ idé.", parts: ["dum"] },
+	{ da: "smuk", ru: "красивый", ex: "Haven var ___ om foråret.", parts: ["smuk"] },
+	{ da: "grim", ru: "уродливый", ex: "Det var en ___ bygning.", parts: ["grim"] },
+	{ da: "hurtig", ru: "быстрый", ex: "Han løb ___ til bussen.", parts: ["hurtig"] },
+	{ da: "langsom", ru: "медленный", ex: "Toget var ___ i dag.", parts: ["langsom"] },
+	{ da: "høj", ru: "высокий", ex: "Bygningen var meget ___.", parts: ["høj"] },
+	{ da: "lav", ru: "низкий", ex: "Bordet var for ___.", parts: ["lav"] },
+	{ da: "bred", ru: "широкий", ex: "Vejen var ___.", parts: ["bred"] },
+	{ da: "smal", ru: "узкий", ex: "Stien var ___.", parts: ["smal"] },
+	{ da: "dyb", ru: "глубокий", ex: "Havet var ___ her.", parts: ["dyb"] },
+	{ da: "varm", ru: "тёплый", ex: "Vandet var ___.", parts: ["varm"] },
+	{ da: "kold", ru: "холодный", ex: "Det var en ___ vinterdag.", parts: ["kold"] },
+	{ da: "våd", ru: "мокрый", ex: "Jorden var ___ efter regnen.", parts: ["våd"] },
+	{ da: "tør", ru: "сухой", ex: "Luften var ___.", parts: ["tør"] },
+	{ da: "lys", ru: "светлый", ex: "Rummet var ___.", parts: ["lys"] },
+	{ da: "mørk", ru: "тёмный", ex: "Himlen var ___ om aftenen.", parts: ["mørk"] },
+	{ da: "rig", ru: "богатый", ex: "Han voksede op i en ___ familie.", parts: ["rig"] },
+	{ da: "fattig", ru: "бедный", ex: "Børnene kom fra ___ familier.", parts: ["fattig"] },
+	{ da: "modig", ru: "смелый", ex: "Hun tog en ___ beslutning.", parts: ["modig"] },
+	{ da: "frygtsom", ru: "робкий", ex: "Han var ___ ved at møde fremmede.", parts: ["frygtsom"] },
+	{ da: "trofast", ru: "верный", ex: "Hunden var ___ mod sin ejer.", parts: ["trofast"] },
+	{ da: "utroværdig", ru: "недостоверный", ex: "Hans forklaring var ___.", parts: ["utroværdig"] },
+	{ da: "nøjagtig", ru: "точный", ex: "Målingen var ___.", parts: ["nøjagtig"] },
+	{ da: "unøjagtig", ru: "неточный", ex: "Opgaven var ___ udført.", parts: ["unøjagtig"] },
+	{ da: "præcis", ru: "аккуратный, точный", ex: "Tiden blev ___.", parts: ["præcis"] },
+	{ da: "farlig", ru: "опасный", ex: "Vejen var ___ at krydse.", parts: ["farlig"] },
+	{ da: "sikker", ru: "безопасный", ex: "Området er ___.", parts: ["sikker"] },
+	{ da: "svær", ru: "тяжёлый, сложный", ex: "Prøven var ___.", parts: ["svær"] },
+	{ da: "let", ru: "лёгкий", ex: "Opgaven var ___.", parts: ["let"] },
+	{ da: "mærkelig", ru: "странный", ex: "Det var en ___ oplevelse.", parts: ["mærkelig"] },
+	{ da: "besværlig", ru: "затруднительный", ex: "Det var ___ at finde parkeringsplads.", parts: ["besværlig"] },
+	{ da: "uventet", ru: "неожиданный", ex: "Besøget var ___.", parts: ["uventet"] },
+	{ da: "seriøs", ru: "серьёзный", ex: "Han tog sagen ___.", parts: ["seriøs"] },
+	{ da: "sjov", ru: "весёлый", ex: "Filmen var ___.", parts: ["sjov"] },
+	{ da: "interessant", ru: "интересный", ex: "Bogen var ___.", parts: ["interessant"] },
+	{ da: "kedelig", ru: "скучный", ex: "Mødet var ___.", parts: ["kedelig"] },
+	{ da: "hyggelig", ru: "уютный, приятный", ex: "Huset var ___.", parts: ["hyggelig"] },
+	{ da: "uhyggelig", ru: "жуткий", ex: "Filmen var ___.", parts: ["uhyggelig"] }
+];
+
+
+const container = document.getElementById("wordsContainer");
+
+words.forEach((w, idx) => {
+  const div = document.createElement("div");
+  div.className = "word";
+
+  const da = document.createElement("div");
+  da.className = "daWord";
+  da.textContent = "DA: " + w.da;
+
+  const ru = document.createElement("div");
+  ru.className = "ruWord";
+  ru.textContent = "RU: " + w.ru;
+
+  const exDiv = document.createElement("div");
+  const parts = w.parts;
+  let partIdx = 0;
+  w.ex.split(" ").forEach(word => {
+    if(word.includes("___")) {
+      const input = document.createElement("input");
+      input.type = "text";
+      input.dataset.word = parts[partIdx].toLowerCase();
+      partIdx++;
+      exDiv.appendChild(input);
+      exDiv.appendChild(document.createTextNode(" "));
+    } else {
+      const span = document.createElement("span");
+      span.textContent = word;
+      span.className = "wordSpan";
+      span.dataset.word = word.replace(/[.,!?]/g,"").toLowerCase();
+      exDiv.appendChild(span);
+      exDiv.appendChild(document.createTextNode(" "));
+    }
+  });
+
+  // Кнопка проверки ввода
+  const checkBtn = document.createElement("button");
+  checkBtn.textContent = "Tjek";
+  checkBtn.onclick = () => {
+    exDiv.querySelectorAll("input").forEach(inp => {
+      if(inp.value.trim().toLowerCase() === inp.dataset.word){
+        inp.classList.add("correct");
+        inp.classList.remove("wrong");
+      } else {
+        inp.classList.add("wrong");
+        inp.classList.remove("correct");
+      }
+    });
+  };
+
+  // 🎤 Распознавание речи с микрофона
+  const micBtn = document.createElement("button");
+  micBtn.textContent = "🎙️ Læs højt";
+  micBtn.onclick = () => {
+    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    recognition.lang = "da-DK";
+    recognition.interimResults = false;
+    recognition.start();
+
+    recognition.onresult = event => {
+      const spoken = event.results[0][0].transcript.toLowerCase();
+      exDiv.querySelectorAll("span, input").forEach(el => {
+        const word = el.dataset.word;
+        if(spoken.includes(word)){
+          el.classList.add("correct");
+          el.classList.remove("wrong");
+        } else {
+          el.classList.add("wrong");
+          el.classList.remove("correct");
+        }
+      });
+    };
+    recognition.onerror = err => console.error("SpeechRecognition error:", err);
+  };
+
+  // ⏺️ Запись и воспроизведение голоса
+  const recordBtn = document.createElement("button");
+  recordBtn.textContent = "⏺️ Optag og spil";
+  let audioBlob = null;
+
+  recordBtn.onclick = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    const mediaRecorder = new MediaRecorder(stream);
+    let chunks = [];
+    mediaRecorder.ondataavailable = e => chunks.push(e.data);
+    mediaRecorder.onstop = () => {
+      audioBlob = new Blob(chunks, { type: 'audio/webm' });
+      const audioUrl = URL.createObjectURL(audioBlob);
+      const audio = new Audio(audioUrl);
+      audio.play();
+    };
+    mediaRecorder.start();
+    setTimeout(() => mediaRecorder.stop(), 3000); // записываем 3 сек
+  };
+
+  // 🔊 Прослушать оригинал
+  const playOrigBtn = document.createElement("button");
+  playOrigBtn.textContent = "▶️ Hør original";
+  playOrigBtn.onclick = () => {
+    const utterance = new SpeechSynthesisUtterance(w.ex.replace(/___/g, w.parts.join(" ")));
+    utterance.lang = "da-DK";
+    window.speechSynthesis.speak(utterance);
+  };
+
+  div.appendChild(da);
+  div.appendChild(ru);
+  div.appendChild(exDiv);
+  div.appendChild(checkBtn);
+  div.appendChild(micBtn);
+  div.appendChild(recordBtn);
+  div.appendChild(playOrigBtn);
+  container.appendChild(div);
+});
+
+// скрытие слов / переводов
+document.getElementById("toggleWords").onchange = e => {
+  document.querySelectorAll(".daWord").forEach(d => d.classList.toggle("hidden", e.target.checked));
+};
+document.getElementById("toggleTranslations").onchange = e => {
+  document.querySelectorAll(".ruWord").forEach(d => d.classList.toggle("hidden", e.target.checked));
+};
+</script>
+</body>
+</html>
