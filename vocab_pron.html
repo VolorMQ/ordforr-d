@@ -75,43 +75,59 @@ words.forEach((w, idx) => {
   ru.className = "ruWord";
   ru.textContent = "RU: " + w.ru;
 
+  // --- Генерация предложения с отдельными полями для каждого слова ---
   const exDiv = document.createElement("div");
-  const parts = w.parts;
   let partIdx = 0;
   w.ex.split(" ").forEach(word => {
     if(word.includes("___")) {
-      const input = document.createElement("input");
-      input.type = "text";
-      input.dataset.word = parts[partIdx].toLowerCase();
-      partIdx++;
-      exDiv.appendChild(input);
-      exDiv.appendChild(document.createTextNode(" "));
+      // создаем отдельное поле для каждого слова из parts
+      w.parts.forEach(p => {
+        const span = document.createElement("span");
+        span.className = "wordPart";
+        const input = document.createElement("input");
+        input.type = "text";
+        input.dataset.word = p.toLowerCase();
+        span.appendChild(input);
+        exDiv.appendChild(span);
+      });
     } else {
       const span = document.createElement("span");
-      span.textContent = word;
       span.className = "wordSpan";
+      span.textContent = word;
       span.dataset.word = word.replace(/[.,!?]/g,"").toLowerCase();
       exDiv.appendChild(span);
-      exDiv.appendChild(document.createTextNode(" "));
     }
+    exDiv.appendChild(document.createTextNode(" "));
   });
 
-  // Кнопка проверки ввода
+  // --- Кнопка проверки ---
   const checkBtn = document.createElement("button");
   checkBtn.textContent = "Tjek";
   checkBtn.onclick = () => {
+    let allCorrect = true;
     exDiv.querySelectorAll("input").forEach(inp => {
-      if(inp.value.trim().toLowerCase() === inp.dataset.word){
+      const correctWords = inp.dataset.word.toLowerCase().split(" ");
+      const userWords = inp.value.trim().toLowerCase().split(" ");
+      const isCorrect = correctWords.length === userWords.length &&
+                        correctWords.every((w,i) => w===userWords[i]);
+      if(isCorrect) {
         inp.classList.add("correct");
         inp.classList.remove("wrong");
       } else {
         inp.classList.add("wrong");
         inp.classList.remove("correct");
+        allCorrect = false;
       }
     });
+
+    const result = document.createElement("div");
+    result.className = allCorrect ? "correct" : "wrong";
+    result.textContent = allCorrect ? "Korrekt!" : "Forkert!";
+    exDiv.appendChild(result);
+    setTimeout(() => result.remove(), 1500);
   };
 
-  // 🎤 Распознавание речи с микрофона
+  // --- Распознавание речи с микрофона ---
   const micBtn = document.createElement("button");
   micBtn.textContent = "🎙️ Læs højt";
   micBtn.onclick = () => {
@@ -136,11 +152,10 @@ words.forEach((w, idx) => {
     recognition.onerror = err => console.error("SpeechRecognition error:", err);
   };
 
-  // ⏺️ Запись и воспроизведение голоса
+  // --- Запись и воспроизведение ---
   const recordBtn = document.createElement("button");
   recordBtn.textContent = "⏺️ Optag og spil";
   let audioBlob = null;
-
   recordBtn.onclick = async () => {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     const mediaRecorder = new MediaRecorder(stream);
@@ -153,10 +168,10 @@ words.forEach((w, idx) => {
       audio.play();
     };
     mediaRecorder.start();
-    setTimeout(() => mediaRecorder.stop(), 3000); // записываем 3 сек
+    setTimeout(() => mediaRecorder.stop(), 3000);
   };
 
-  // 🔊 Прослушать оригинал
+  // --- Прослушать оригинал ---
   const playOrigBtn = document.createElement("button");
   playOrigBtn.textContent = "▶️ Hør original";
   playOrigBtn.onclick = () => {
@@ -175,7 +190,7 @@ words.forEach((w, idx) => {
   container.appendChild(div);
 });
 
-// скрытие слов / переводов
+// --- скрытие слов / переводов ---
 document.getElementById("toggleWords").onchange = e => {
   document.querySelectorAll(".daWord").forEach(d => d.classList.toggle("hidden", e.target.checked));
 };

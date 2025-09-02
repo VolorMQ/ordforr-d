@@ -2,7 +2,7 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
-<title>Træning af ordforråd adverbier(DA→RU)</title>
+<title>Træning af ordforråd brøker(DA→RU)</title>
 <style>
 body { font-family: sans-serif; line-height: 1.6; margin: 20px; }
 .word { border: 1px solid #ccc; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
@@ -15,7 +15,7 @@ button { margin-left: 5px; padding: 5px 10px; }
 </style>
 </head>
 <body>
-<h2>Træning af ordforråd adverbier(DA→RU)</h2>
+<h2>Træning af ordforråd brøker(DA→RU)</h2>
 <label><input type="checkbox" id="toggleWords"> Skjul alle ord</label>
 <label><input type="checkbox" id="toggleTranslations"> Skjul alle oversættelser</label>
 
@@ -23,43 +23,35 @@ button { margin-left: 5px; padding: 5px 10px; }
 
 <script>
 const words = [
-  // --- Союзы, частицы, предлоги ---
-  { da: "her", ru: "здесь", ex: "Jeg bor ___.", parts: ["her"] },
-  { da: "der", ru: "там", ex: "Han står ___.", parts: ["der"] },
-  { da: "nu", ru: "сейчас", ex: "Vi går ___.", parts: ["nu"] },
-  { da: "snart", ru: "скоро", ex: "Bussen kommer ___.", parts: ["snart"] },
-  { da: "ofte", ru: "часто", ex: "Hun besøger os ___.", parts: ["ofte"] },
-  { da: "aldrig", ru: "никогда", ex: "Jeg har ___ været i Paris.", parts: ["aldrig"] },
-  { da: "altid", ru: "всегда", ex: "Han er ___ glad.", parts: ["altid"] },
-  { da: "måske", ru: "может быть", ex: "___ kommer han senere.", parts: ["måske"] },
-  { da: "ofte", ru: "часто", ex: "Vi spiser ___ på restauranten.", parts: ["ofte"] },
-  { da: "sammen", ru: "вместе", ex: "Vi går ___ i skole.", parts: ["sammen"] },
-  { da: "allerede", ru: "уже", ex: "Jeg har ___ spist.", parts: ["allerede"] },
-  { da: "stadig", ru: "всё ещё", ex: "Han sover ___.", parts: ["stadig"] },
-  { da: "må", ru: "можно, должен", ex: "Du ___ ikke ryge her.", parts: ["må"] },
-  { da: "ligesom", ru: "как бы, словно", ex: "Han taler ___ en lærer.", parts: ["ligesom"] },
-  { da: "forsigtigt", ru: "осторожно", ex: "Gå ___ over vejen.", parts: ["forsigtigt"] },
-  { da: "pludselig", ru: "вдруг", ex: "___ begyndte det at regne.", parts: ["pludselig"] },
-  { da: "meget", ru: "очень", ex: "Hun er ___ glad.", parts: ["meget"] },
-  { da: "lidt", ru: "немного", ex: "Jeg taler ___ dansk.", parts: ["lidt"] },
-  { da: "sikkert", ru: "наверняка", ex: "Han kommer ___ til festen.", parts: ["sikkert"] },
-  { da: "desværre", ru: "к сожалению", ex: "___ kan jeg ikke hjælpe dig.", parts: ["desværre"] },
-  { da: "pligtigt", ru: "обязательно", ex: "Du skal ___ aflevere opgaven.", parts: ["pligtigt"] },
-  { da: "temmelig", ru: "довольно, весьма", ex: "Hun er ___ træt.", parts: ["temmelig"] },
-  { da: "snildt", ru: "умело", ex: "Han løser opgaven ___ .", parts: ["snildt"] },
-  { da: "tilfældigt", ru: "случайно", ex: "Jeg mødte ham ___ på gaden.", parts: ["tilfældigt"] },
-  { da: "langsomt", ru: "медленно", ex: "Han går ___ til skole.", parts: ["langsomt"] },
-  { da: "hurtigt", ru: "быстро", ex: "Bilen kører ___.", parts: ["hurtigt"] },
-  { da: "desuden", ru: "к тому же", ex: "___ er hun også dygtig.", parts: ["desuden"] },
-  { da: "plads", ru: "место (наречие?), см. контекст", ex: "Vi står ___ til venstre.", parts: ["plads"] },
-  { da: "for det meste", ru: "по большей части", ex: "Vi spiser ude ___.", parts: ["for det meste"] },
-  { da: "ofte nok", ru: "довольно часто", ex: "Hun besøger os ___ .", parts: ["ofte nok"] },
-  { da: "særligt", ru: "особенно", ex: "Han er ___ dygtig til matematik.", parts: ["særligt"] },
-  { da: "umuligt", ru: "невозможно", ex: "Det er ___ at forstå.", parts: ["umuligt"] },
-  { da: "præcist", ru: "точно", ex: "Han gjorde det ___ som jeg sagde.", parts: ["præcist"] },
-  { da: "langs", ru: "вдоль", ex: "Vi gik ___ floden.", parts: ["langs"] },
-  { da: "omkring", ru: "около", ex: "Der var ___ 50 mennesker.", parts: ["omkring"] },
-  { da: "både", ru: "как…так и", ex: "___ børnene ___ voksne var glade.", parts: ["både","og"] }
+  { da: "en halv", ru: "половина", ex: "Jeg spiser ___ kage.", parts: ["en","halv"] },
+  { da: "en tredjedel", ru: "одна треть", ex: "Vi deler ___ pizza.", parts: ["en","tredjedel"] },
+  { da: "to tredjedele", ru: "две трети", ex: "Hun bruger ___ af tiden.", parts: ["to","tredjedele"] },
+  { da: "en fjerdedel", ru: "одна четверть", ex: "Han drikker ___ liter mælk.", parts: ["en","fjerdedel"] },
+  { da: "tre fjerdedele", ru: "три четверти", ex: "Der er ___ af kagen tilbage.", parts: ["tre","fjerdedele"] },
+  { da: "en femtedel", ru: "одна пятая", ex: "Vi spiser ___ af pizzaen.", parts: ["en","femtedel"] },
+  { da: "to femtedele", ru: "две пятых", ex: "Han har ___ af pengene.", parts: ["to","femtedele"] },
+  { da: "tre femtedele", ru: "три пятых", ex: "Hun drikker ___ af mælken.", parts: ["tre","femtedele"] },
+  { da: "fire femtedele", ru: "четыре пятых", ex: "Der er ___ af vandet tilbage.", parts: ["fire","femtedele"] },
+  { da: "en sjettedel", ru: "одна шестая", ex: "Vi deler ___ kage.", parts: ["en","sjettedel"] },
+  { da: "to sjettedele", ru: "две шестых", ex: "Han har ___ af pengene.", parts: ["to","sjettedele"] },
+  { da: "en syvendedel", ru: "одна седьмая", ex: "Hun spiser ___ af kagen.", parts: ["en","syvendedel"] },
+  { da: "to syvendedele", ru: "две седьмых", ex: "Der er ___ tilbage.", parts: ["to","syvendedele"] },
+  { da: "en ottendedel", ru: "одна восьмая", ex: "Vi drikker ___ af mælken.", parts: ["en","ottendedel"] },
+  { da: "tre ottendedele", ru: "три восьмых", ex: "Han spiser ___ af pizzaen.", parts: ["tre","ottendedele"] },
+  { da: "en nindedel", ru: "одна девятая", ex: "Der er ___ af kagen tilbage.", parts: ["en","nindedel"] },
+  { da: "to nindedele", ru: "две девятых", ex: "Hun drikker ___ af saften.", parts: ["to","nindedele"] },
+  { da: "en tiendedel", ru: "одна десятая", ex: "Vi bruger ___ af tiden.", parts: ["en","tiendedel"] },
+  { da: "tre tiendedele", ru: "три десятых", ex: "Han har ___ af pengene.", parts: ["tre","tiendedele"] },
+  { da: "halvanden", ru: "полтора", ex: "Jeg har ___ liter mælk.", parts: ["halvanden"] },
+  { da: "to og en halv", ru: "две с половиной", ex: "Han drikker ___ glas vand.", parts: ["to","og","en","halv"] },
+  { da: "tre og en halv", ru: "три с половиной", ex: "Vi spiser ___ pizzaer.", parts: ["tre","og","en","halv"] },
+  { da: "fire og en halv", ru: "четыре с половиной", ex: "Hun løber ___ kilometer.", parts: ["fire","og","en","halv"] },
+  { da: "fem og en halv", ru: "пять с половиной", ex: "Jeg arbejder ___ timer.", parts: ["fem","og","en","halv"] },
+  { da: "seks og en halv", ru: "шесть с половиной", ex: "Han læser ___ bøger.", parts: ["seks","og","en","halv"] },
+  { da: "syv og en halv", ru: "семь с половиной", ex: "Der er ___ børn i klassen.", parts: ["syv","og","en","halv"] },
+  { da: "otte og en halv", ru: "восемь с половиной", ex: "Vi spiser ___ kager.", parts: ["otte","og","en","halv"] },
+  { da: "ni og en halv", ru: "девять с половиной", ex: "Han kører ___ kilometer.", parts: ["ni","og","en","halv"] },
+  { da: "ti og en halv", ru: "десять с половиной", ex: "Hun har ___ penge.", parts: ["ti","og","en","halv"] }
 ];
 
 

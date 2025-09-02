@@ -2,7 +2,7 @@
 <html lang="da">
 <head>
 <meta charset="UTF-8">
-<title>Træning af ordforråd adverbier(DA→RU)</title>
+<title>Træning af ordforråd ubestemte talord(DA→RU)</title>
 <style>
 body { font-family: sans-serif; line-height: 1.6; margin: 20px; }
 .word { border: 1px solid #ccc; border-radius: 8px; padding: 12px; margin-bottom: 12px; }
@@ -15,7 +15,7 @@ button { margin-left: 5px; padding: 5px 10px; }
 </style>
 </head>
 <body>
-<h2>Træning af ordforråd adverbier(DA→RU)</h2>
+<h2>Træning af ordforråd ubestemte talord(DA→RU)</h2>
 <label><input type="checkbox" id="toggleWords"> Skjul alle ord</label>
 <label><input type="checkbox" id="toggleTranslations"> Skjul alle oversættelser</label>
 
@@ -23,43 +23,26 @@ button { margin-left: 5px; padding: 5px 10px; }
 
 <script>
 const words = [
-  // --- Союзы, частицы, предлоги ---
-  { da: "her", ru: "здесь", ex: "Jeg bor ___.", parts: ["her"] },
-  { da: "der", ru: "там", ex: "Han står ___.", parts: ["der"] },
-  { da: "nu", ru: "сейчас", ex: "Vi går ___.", parts: ["nu"] },
-  { da: "snart", ru: "скоро", ex: "Bussen kommer ___.", parts: ["snart"] },
-  { da: "ofte", ru: "часто", ex: "Hun besøger os ___.", parts: ["ofte"] },
-  { da: "aldrig", ru: "никогда", ex: "Jeg har ___ været i Paris.", parts: ["aldrig"] },
-  { da: "altid", ru: "всегда", ex: "Han er ___ glad.", parts: ["altid"] },
-  { da: "måske", ru: "может быть", ex: "___ kommer han senere.", parts: ["måske"] },
-  { da: "ofte", ru: "часто", ex: "Vi spiser ___ på restauranten.", parts: ["ofte"] },
-  { da: "sammen", ru: "вместе", ex: "Vi går ___ i skole.", parts: ["sammen"] },
-  { da: "allerede", ru: "уже", ex: "Jeg har ___ spist.", parts: ["allerede"] },
-  { da: "stadig", ru: "всё ещё", ex: "Han sover ___.", parts: ["stadig"] },
-  { da: "må", ru: "можно, должен", ex: "Du ___ ikke ryge her.", parts: ["må"] },
-  { da: "ligesom", ru: "как бы, словно", ex: "Han taler ___ en lærer.", parts: ["ligesom"] },
-  { da: "forsigtigt", ru: "осторожно", ex: "Gå ___ over vejen.", parts: ["forsigtigt"] },
-  { da: "pludselig", ru: "вдруг", ex: "___ begyndte det at regne.", parts: ["pludselig"] },
-  { da: "meget", ru: "очень", ex: "Hun er ___ glad.", parts: ["meget"] },
-  { da: "lidt", ru: "немного", ex: "Jeg taler ___ dansk.", parts: ["lidt"] },
-  { da: "sikkert", ru: "наверняка", ex: "Han kommer ___ til festen.", parts: ["sikkert"] },
-  { da: "desværre", ru: "к сожалению", ex: "___ kan jeg ikke hjælpe dig.", parts: ["desværre"] },
-  { da: "pligtigt", ru: "обязательно", ex: "Du skal ___ aflevere opgaven.", parts: ["pligtigt"] },
-  { da: "temmelig", ru: "довольно, весьма", ex: "Hun er ___ træt.", parts: ["temmelig"] },
-  { da: "snildt", ru: "умело", ex: "Han løser opgaven ___ .", parts: ["snildt"] },
-  { da: "tilfældigt", ru: "случайно", ex: "Jeg mødte ham ___ på gaden.", parts: ["tilfældigt"] },
-  { da: "langsomt", ru: "медленно", ex: "Han går ___ til skole.", parts: ["langsomt"] },
-  { da: "hurtigt", ru: "быстро", ex: "Bilen kører ___.", parts: ["hurtigt"] },
-  { da: "desuden", ru: "к тому же", ex: "___ er hun også dygtig.", parts: ["desuden"] },
-  { da: "plads", ru: "место (наречие?), см. контекст", ex: "Vi står ___ til venstre.", parts: ["plads"] },
-  { da: "for det meste", ru: "по большей части", ex: "Vi spiser ude ___.", parts: ["for det meste"] },
-  { da: "ofte nok", ru: "довольно часто", ex: "Hun besøger os ___ .", parts: ["ofte nok"] },
-  { da: "særligt", ru: "особенно", ex: "Han er ___ dygtig til matematik.", parts: ["særligt"] },
-  { da: "umuligt", ru: "невозможно", ex: "Det er ___ at forstå.", parts: ["umuligt"] },
-  { da: "præcist", ru: "точно", ex: "Han gjorde det ___ som jeg sagde.", parts: ["præcist"] },
-  { da: "langs", ru: "вдоль", ex: "Vi gik ___ floden.", parts: ["langs"] },
-  { da: "omkring", ru: "около", ex: "Der var ___ 50 mennesker.", parts: ["omkring"] },
-  { da: "både", ru: "как…так и", ex: "___ børnene ___ voksne var glade.", parts: ["både","og"] }
+  { da: "mange", ru: "много", ex: "Der er ___ mennesker i byen.", parts: ["mange"] },
+  { da: "få", ru: "мало", ex: "Der var kun ___ biler på vejen.", parts: ["få"] },
+  { da: "flere", ru: "несколько, больше", ex: "Vi har ___ venner her.", parts: ["flere"] },
+  { da: "en del", ru: "часть, немало", ex: "___ af eleverne forstår dansk.", parts: ["en del"] },
+  { da: "nogle", ru: "некоторые", ex: "Jeg kender ___ af dem.", parts: ["nogle"] },
+  { da: "alle", ru: "все", ex: "___ børnene leger i haven.", parts: ["alle"] },
+  { da: "hver", ru: "каждый", ex: "___ dag går jeg en tur.", parts: ["hver"] },
+  { da: "hvert", ru: "каждое", ex: "Han læser et kapitel ___ aften.", parts: ["hvert"] },
+  { da: "enhver", ru: "любой", ex: "___ kan begå en fejl.", parts: ["enhver"] },
+  { da: "ingen", ru: "никто / никакой", ex: "Der var ___ på kontoret.", parts: ["ingen"] },
+  { da: "alting", ru: "всё", ex: "Han ved ___ om computere.", parts: ["alting"] },
+  { da: "intet", ru: "ничего", ex: "Der var ___ i køleskabet.", parts: ["intet"] },
+  { da: "samtlige", ru: "все без исключения", ex: "___ elever deltog i testen.", parts: ["samtlige"] },
+  { da: "adskillige", ru: "множество, немало", ex: "___ gange har jeg prøvet.", parts: ["adskillige"] },
+  { da: "utallige", ru: "бесчисленные", ex: "Der er ___ stjerner på himlen.", parts: ["utallige"] },
+  { da: "et par", ru: "пара", ex: "Jeg har ___ sko.", parts: ["et","par"] },
+  { da: "en håndfuld", ru: "горсть, несколько", ex: "Han tog ___ nødder.", parts: ["en","håndfuld"] },
+  { da: "en række", ru: "ряд, несколько", ex: "Vi har ___ muligheder.", parts: ["en","række"] },
+  { da: "en smule", ru: "немного", ex: "Der er ___ sukker tilbage.", parts: ["en","smule"] },
+  { da: "et dusin", ru: "дюжина", ex: "Jeg købte ___ æg.", parts: ["et","dusin"] }
 ];
 
 
