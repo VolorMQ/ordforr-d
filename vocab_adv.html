@@ -77,42 +77,77 @@ words.forEach((w, idx) => {
   ru.className = "ruWord";
   ru.textContent = "RU: " + w.ru;
 
-  // --- Генерация предложения с отдельными полями для каждого слова ---
   const exDiv = document.createElement("div");
-  let partIdx = 0;
-  w.ex.split(" ").forEach(word => {
-    if(word.includes("___")) {
-      // создаем отдельное поле для каждого слова из parts
-      w.parts.forEach(p => {
+
+  if (w.da.includes("...") && w.parts.length === 2) {
+    // конструкции с "..."
+    const exParts = w.ex.split("___");
+    
+    // Первое поле
+    const span1 = document.createElement("span");
+    span1.textContent = exParts[0];
+    exDiv.appendChild(span1);
+
+    const input1 = document.createElement("input");
+    input1.type = "text";
+    input1.dataset.word = w.parts[0].toLowerCase();
+    input1.className = "wordPart";
+    exDiv.appendChild(input1);
+
+    const spanMid = document.createElement("span");
+    spanMid.textContent = exParts[1];
+    exDiv.appendChild(spanMid);
+
+    // Второе поле
+    const input2 = document.createElement("input");
+    input2.type = "text";
+    input2.dataset.word = w.parts[1].toLowerCase();
+    input2.className = "wordPart";
+    exDiv.appendChild(input2);
+
+    const spanEnd = document.createElement("span");
+    spanEnd.textContent = exParts[2] ? exParts[2] : "";
+    exDiv.appendChild(spanEnd);
+
+  } else {
+    // обычное создание input для каждого слова из parts
+    let partIdx = 0;
+    w.ex.split(" ").forEach(word => {
+      if (word.includes("___")) {
+        // проверяем, есть ли в части несколько слов
+        const wordsArray = w.parts[partIdx].split(" ");
+        wordsArray.forEach(wPart => {
+          const input = document.createElement("input");
+          input.type = "text";
+          input.dataset.word = wPart.toLowerCase();
+          input.className = "wordPart";
+          exDiv.appendChild(input);
+          exDiv.appendChild(document.createTextNode(" "));
+        });
+        partIdx++;
+      } else {
         const span = document.createElement("span");
-        span.className = "wordPart";
-        const input = document.createElement("input");
-        input.type = "text";
-        input.dataset.word = p.toLowerCase();
-        span.appendChild(input);
+        span.textContent = word;
+        span.className = "wordSpan";
+        span.dataset.word = word.replace(/[.,!?]/g, "").toLowerCase();
         exDiv.appendChild(span);
-      });
-    } else {
-      const span = document.createElement("span");
-      span.className = "wordSpan";
-      span.textContent = word;
-      span.dataset.word = word.replace(/[.,!?]/g,"").toLowerCase();
-      exDiv.appendChild(span);
-    }
-    exDiv.appendChild(document.createTextNode(" "));
-  });
+        exDiv.appendChild(document.createTextNode(" "));
+      }
+    });
+  }
 
   // --- Кнопка проверки ---
   const checkBtn = document.createElement("button");
   checkBtn.textContent = "Tjek";
   checkBtn.onclick = () => {
+    const inputs = exDiv.querySelectorAll("input");
     let allCorrect = true;
-    exDiv.querySelectorAll("input").forEach(inp => {
+    inputs.forEach(inp => {
       const correctWords = inp.dataset.word.toLowerCase().split(" ");
       const userWords = inp.value.trim().toLowerCase().split(" ");
       const isCorrect = correctWords.length === userWords.length &&
-                        correctWords.every((w,i) => w===userWords[i]);
-      if(isCorrect) {
+                        correctWords.every((w,i)=>w===userWords[i]);
+      if(isCorrect){
         inp.classList.add("correct");
         inp.classList.remove("wrong");
       } else {
@@ -121,12 +156,11 @@ words.forEach((w, idx) => {
         allCorrect = false;
       }
     });
-
     const result = document.createElement("div");
     result.className = allCorrect ? "correct" : "wrong";
     result.textContent = allCorrect ? "Korrekt!" : "Forkert!";
     exDiv.appendChild(result);
-    setTimeout(() => result.remove(), 1500);
+    setTimeout(()=>result.remove(),1500);
   };
 
   // --- Распознавание речи с микрофона ---
@@ -137,15 +171,14 @@ words.forEach((w, idx) => {
     recognition.lang = "da-DK";
     recognition.interimResults = false;
     recognition.start();
-
     recognition.onresult = event => {
       const spoken = event.results[0][0].transcript.toLowerCase();
       exDiv.querySelectorAll("span, input").forEach(el => {
         const word = el.dataset.word;
-        if(spoken.includes(word)){
+        if(word && spoken.includes(word)){
           el.classList.add("correct");
           el.classList.remove("wrong");
-        } else {
+        } else if(word){
           el.classList.add("wrong");
           el.classList.remove("correct");
         }
@@ -154,30 +187,13 @@ words.forEach((w, idx) => {
     recognition.onerror = err => console.error("SpeechRecognition error:", err);
   };
 
-  // --- Запись и воспроизведение ---
-  const recordBtn = document.createElement("button");
-  recordBtn.textContent = "⏺️ Optag og spil";
-  let audioBlob = null;
-  recordBtn.onclick = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const mediaRecorder = new MediaRecorder(stream);
-    let chunks = [];
-    mediaRecorder.ondataavailable = e => chunks.push(e.data);
-    mediaRecorder.onstop = () => {
-      audioBlob = new Blob(chunks, { type: 'audio/webm' });
-      const audioUrl = URL.createObjectURL(audioBlob);
-      const audio = new Audio(audioUrl);
-      audio.play();
-    };
-    mediaRecorder.start();
-    setTimeout(() => mediaRecorder.stop(), 3000);
-  };
-
   // --- Прослушать оригинал ---
   const playOrigBtn = document.createElement("button");
   playOrigBtn.textContent = "▶️ Hør original";
   playOrigBtn.onclick = () => {
-    const utterance = new SpeechSynthesisUtterance(w.ex.replace(/___/g, w.parts.join(" ")));
+    const utterance = new SpeechSynthesisUtterance(
+      w.ex.replace(/___/g, ()=>w.parts.join(" "))
+    );
     utterance.lang = "da-DK";
     window.speechSynthesis.speak(utterance);
   };
@@ -187,7 +203,6 @@ words.forEach((w, idx) => {
   div.appendChild(exDiv);
   div.appendChild(checkBtn);
   div.appendChild(micBtn);
-  div.appendChild(recordBtn);
   div.appendChild(playOrigBtn);
   container.appendChild(div);
 });
