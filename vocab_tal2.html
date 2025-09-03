@@ -73,10 +73,8 @@ words.forEach((w, idx) => {
   const exDiv = document.createElement("div");
 
   if (w.da.includes("...") && w.parts.length === 2) {
-    // конструкции с "..."
     const exParts = w.ex.split("___");
     
-    // Первое поле
     const span1 = document.createElement("span");
     span1.textContent = exParts[0];
     exDiv.appendChild(span1);
@@ -91,7 +89,6 @@ words.forEach((w, idx) => {
     spanMid.textContent = exParts[1];
     exDiv.appendChild(spanMid);
 
-    // Второе поле
     const input2 = document.createElement("input");
     input2.type = "text";
     input2.dataset.word = w.parts[1].toLowerCase();
@@ -103,11 +100,9 @@ words.forEach((w, idx) => {
     exDiv.appendChild(spanEnd);
 
   } else {
-    // обычное создание input для каждого слова из parts
     let partIdx = 0;
     w.ex.split(" ").forEach(word => {
       if (word.includes("___")) {
-        // проверяем, есть ли в части несколько слов
         const wordsArray = w.parts[partIdx].split(" ");
         wordsArray.forEach(wPart => {
           const input = document.createElement("input");
@@ -129,7 +124,6 @@ words.forEach((w, idx) => {
     });
   }
 
-  // --- Кнопка проверки ---
   const checkBtn = document.createElement("button");
   checkBtn.textContent = "Tjek";
   checkBtn.onclick = () => {
@@ -156,7 +150,6 @@ words.forEach((w, idx) => {
     setTimeout(()=>result.remove(),1500);
   };
 
-  // --- Распознавание речи с микрофона ---
   const micBtn = document.createElement("button");
   micBtn.textContent = "🎙️ Læs højt";
   micBtn.onclick = () => {
@@ -180,14 +173,37 @@ words.forEach((w, idx) => {
     recognition.onerror = err => console.error("SpeechRecognition error:", err);
   };
 
-  // --- Прослушать оригинал ---
   const playOrigBtn = document.createElement("button");
   playOrigBtn.textContent = "▶️ Hør original";
+  
+  const speedWrapper = document.createElement("div");
+  speedWrapper.style.display = "flex";
+  speedWrapper.style.alignItems = "center";
+  speedWrapper.style.gap = "6px";
+
+  const speedSlider = document.createElement("input");
+  speedSlider.type = "range";
+  speedSlider.min = "0.5";
+  speedSlider.max = "1.5";
+  speedSlider.step = "0.1";
+  speedSlider.value = "1";
+  speedSlider.className = "speedControl";
+
+  const speedLabel = document.createElement("span");
+  speedLabel.textContent = speedSlider.value + "x";
+  speedLabel.style.fontSize = "0.9em";
+  speedLabel.style.color = "#444";
+
+  speedSlider.addEventListener("input", () => {
+    speedLabel.textContent = speedSlider.value + "x";
+  });
+
   playOrigBtn.onclick = () => {
     const utterance = new SpeechSynthesisUtterance(
       w.ex.replace(/___/g, ()=>w.parts.join(" "))
     );
     utterance.lang = "da-DK";
+    utterance.rate = parseFloat(speedSlider.value);
     window.speechSynthesis.speak(utterance);
   };
 
@@ -197,10 +213,14 @@ words.forEach((w, idx) => {
   div.appendChild(checkBtn);
   div.appendChild(micBtn);
   div.appendChild(playOrigBtn);
+
+  speedWrapper.appendChild(speedSlider);
+  speedWrapper.appendChild(speedLabel);
+  div.appendChild(speedWrapper);
+
   container.appendChild(div);
 });
 
-// --- скрытие слов / переводов ---
 document.getElementById("toggleWords").onchange = e => {
   document.querySelectorAll(".daWord").forEach(d => d.classList.toggle("hidden", e.target.checked));
 };
